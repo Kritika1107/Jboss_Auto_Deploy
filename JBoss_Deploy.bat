@@ -8,13 +8,16 @@ set BACKUP_DIR=%JBOSS_HOME%\backup
 set JBOSS_CLI=%JBOSS_HOME%\bin\jboss-cli.bat
 set WAR_FILE=SampleWebApp.war
 
+:: Step 0: Create a timestamp (yyyyMMdd_HHmmss)
+for /f "tokens=2 delims==" %%I in ('wmic OS Get localdatetime /value') do set datetime=%%I
+set TIMESTAMP=%datetime:~0,8%_%datetime:~8,6%
+
 :: Step 1: Backup existing WAR file
 if exist "%DEPLOY_DIR%\%WAR_FILE%" (
     echo Backing up existing WAR file...
-    set datetime=%date:~10,4%%date:~4,2%%date:~7,2%_%time:~0,2%%time:~3,2%%time:~6,2%
     if not exist "%BACKUP_DIR%" mkdir "%BACKUP_DIR%"
-    move "%DEPLOY_DIR%\%WAR_FILE%" "%BACKUP_DIR%\app-backup-%datetime%.war"
-    echo Backup completed.
+    move "%DEPLOY_DIR%\%WAR_FILE%" "%BACKUP_DIR%\SampleWebApp-backup-%TIMESTAMP%.war"
+    echo Backup completed: SampleWebApp-backup-%TIMESTAMP%.war
 ) else (
     echo No existing WAR to back up.
 )
