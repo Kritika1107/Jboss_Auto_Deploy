@@ -6,42 +6,39 @@ set JBOSS_HOME=C:\Rajan_Dubey\DevOps_Journey\Jboss\EAP-7.4.0
 set DEPLOY_DIR=%JBOSS_HOME%\standalone\deployments
 set BACKUP_DIR=%JBOSS_HOME%\backup
 set JBOSS_CLI=%JBOSS_HOME%\bin\jboss-cli.bat
+set WAR_FILE=SampleWebApp.war
 
-:: Step 1: Check if JBoss is running
-echo Checking if JBoss is running...
-tasklist /FI "IMAGENAME eq java.exe" | findstr /I "java.exe" > nul
-if %ERRORLEVEL% neq 0 (
-    echo JBoss is not running. Proceeding with deployment...
-    set JBOSS_RUNNING=false
-) else (
-    echo JBoss is running. Stopping JBoss...
-    "%JBOSS_CLI%" --connect "command=:shutdown"
-    set JBOSS_RUNNING=true
-    :: Non-interactive sleep (5 seconds) using ping trick
-    ping 127.0.0.1 -n 6 > nul
-)
-
-:: Step 2: Backup existing WAR file
-if exist "%DEPLOY_DIR%\SampleWebApp.war" (
+:: Step 1: Backup existing WAR file
+if exist "%DEPLOY_DIR%\%WAR_FILE%" (
     echo Backing up existing WAR file...
     set datetime=%date:~10,4%%date:~4,2%%date:~7,2%_%time:~0,2%%time:~3,2%%time:~6,2%
     if not exist "%BACKUP_DIR%" mkdir "%BACKUP_DIR%"
-    move "%DEPLOY_DIR%\SampleWebApp.war" "%BACKUP_DIR%\SampleWebApp.war-%datetime%.war"
+    move "%DEPLOY_DIR%\%WAR_FILE%" "%BACKUP_DIR%\app-backup-%datetime%.war"
+    echo Backup completed.
 ) else (
     echo No existing WAR to back up.
 )
 
-:: Step 3: Deploy new WAR
+:: Step 2: Deploy new WAR
 echo Deploying new WAR file...
-copy /Y app.war "%DEPLOY_DIR%"
+copy /Y "%WAR_FILE%" "%DEPLOY_DIR%"
+if %ERRORLEVEL% neq 0 (
+    echo Deployment failed! Exiting...
+    exit /b 1
+)
+echo Deployment completed.
 
-:: Step 4: Restart JBoss only if it was running before
-if !JBOSS_RUNNING! == true (
-    echo Starting JBoss...
-    start "" "%JBOSS_HOME%\bin\standalone.bat"
-) else (
-    echo JBoss was not running earlier. No need to start.
+:: Step 3: Reload JBoss
+echo Reloading JBoss...
+"%JBOSS_CLI%" --connect "command=:reload"
+if %ERRORLEVEL% neq 0 (
+    echo Failed to reload JBoss! Exiting...
+    exit /b 1
 )
 
-echo Deployment completed successfully!
+:: Step 4: Wait for 15 seconds to ensure JBoss is up
+echo Waiting for JBoss to start...
+ping 127.0.0.1 -n 16 > nul
+
+echo JBoss restarted and deployment completed successfully!
 exit 0
