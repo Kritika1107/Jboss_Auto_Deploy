@@ -4,9 +4,16 @@ set DEPLOY_DIR=%JBOSS_HOME%\standalone\deployments
 set BACKUP_DIR=%JBOSS_HOME%\backup
 set JBOSS_CLI=%JBOSS_HOME%\bin\jboss-cli.bat
 
-:: Step 1: Shutdown JBoss gracefully
-echo Shutting down JBoss...
-"%JBOSS_CLI%" --connect "command=:shutdown"
+:: Step 1: Check if JBoss is running
+echo Checking if JBoss is running...
+tasklist /FI "IMAGENAME eq java.exe" | findstr /I "Console" > nul
+if %ERRORLEVEL% neq 0 (
+    echo JBoss is not running. Proceeding with deployment...
+) else (
+    echo JBoss is running. Stopping JBoss...
+    "%JBOSS_CLI%" --connect "command=:shutdown"
+    timeout /t 5
+)
 
 :: Step 2: Backup existing WAR file
 if exist "%DEPLOY_DIR%\SampleWebApp.war" (
