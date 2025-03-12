@@ -9,7 +9,7 @@ set JBOSS_CLI=%JBOSS_HOME%\bin\jboss-cli.bat
 
 :: Step 1: Check if JBoss is running
 echo Checking if JBoss is running...
-tasklist /FI "IMAGENAME eq java.exe" | findstr /I "Console" > nul
+tasklist /FI "IMAGENAME eq java.exe" | findstr /I "java.exe" > nul
 if %ERRORLEVEL% neq 0 (
     echo JBoss is not running. Proceeding with deployment...
     set JBOSS_RUNNING=false
@@ -17,7 +17,8 @@ if %ERRORLEVEL% neq 0 (
     echo JBoss is running. Stopping JBoss...
     "%JBOSS_CLI%" --connect "command=:shutdown"
     set JBOSS_RUNNING=true
-    timeout /t 5 > nul
+    :: Non-interactive sleep (5 seconds) using ping trick
+    ping 127.0.0.1 -n 6 > nul
 )
 
 :: Step 2: Backup existing WAR file
@@ -25,7 +26,7 @@ if exist "%DEPLOY_DIR%\SampleWebApp.war" (
     echo Backing up existing WAR file...
     set datetime=%date:~10,4%%date:~4,2%%date:~7,2%_%time:~0,2%%time:~3,2%%time:~6,2%
     if not exist "%BACKUP_DIR%" mkdir "%BACKUP_DIR%"
-    move "%DEPLOY_DIR%\SampleWebApp.war" "%BACKUP_DIR%\app-backup-%datetime%.war"
+    move "%DEPLOY_DIR%\SampleWebApp.war" "%BACKUP_DIR%\SampleWebApp.war-%datetime%.war"
 ) else (
     echo No existing WAR to back up.
 )
