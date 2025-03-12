@@ -6,7 +6,7 @@ set JBOSS_CLI=%JBOSS_HOME%\bin\jboss-cli.bat
 
 :: Step 1: Shutdown JBoss gracefully
 echo Shutting down JBoss...
-"%JBOSS_CLI%" --connect command=:shutdown
+"%JBOSS_CLI%" --connect "command=:shutdown"
 
 :: Step 2: Backup existing WAR file
 if exist "%DEPLOY_DIR%\SampleWebApp.war" (
