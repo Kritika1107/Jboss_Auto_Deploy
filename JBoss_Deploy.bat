@@ -2,7 +2,7 @@
 setlocal EnableDelayedExpansion
 
 :: Set variables
-set JBOSS_HOME=C:\Rajan_Dubey\DevOps_Journey\Jboss\EAP-7.4.0
+set JBOSS_HOME=C:\Users\AmoghS\EAP-8.1
 set DEPLOY_DIR=%JBOSS_HOME%\standalone\deployments
 set BACKUP_DIR=%JBOSS_HOME%\backup
 set JBOSS_CLI=%JBOSS_HOME%\bin\jboss-cli.bat
