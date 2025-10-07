@@ -6,7 +6,7 @@ set JBOSS_HOME=C:\Users\AmoghS\EAP-8.1
 set DEPLOY_DIR=%JBOSS_HOME%\standalone\deployments
 set BACKUP_DIR=%JBOSS_HOME%\backup
 set JBOSS_CLI=%JBOSS_HOME%\bin\jboss-cli.bat
-set WAR_FILE=SampleWebApp.war
+set WAR_FILE=sample.war
 
 :: Step 0: Create a timestamp (yyyyMMdd_HHmmss)
 for /f "tokens=2 delims==" %%I in ('wmic OS Get localdatetime /value') do set datetime=%%I
